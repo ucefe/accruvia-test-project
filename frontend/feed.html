@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+        <link
+            type="text/css"
+            rel="stylesheet"
+            href="https://unpkg.com/bootstrap/dist/css/bootstrap.min.css"
+        />
+        <script src="https://unpkg.com/vue@3/dist/vue.global.js" defer></script>
+        <script src="./app.js" defer></script>
+
+        <title>Poor Man's Twitter</title>
+    </head>
+    <nav class="navbar bg-light">
+        <div class="container-fluid">
+            <span class="navbar-brand mb-0 h1">Poor Man's Twitter</span>
+        </div>
+    </nav>
+
+    <body>
+        <div id="main" class="p-5">
+            <div class="card">
+                <div class="card-header">Tweet What's On your Mind</div>
+                <div class="card-body">
+                    <form>
+                        <div class="form-group row">
+                            <label
+                                for="inputName"
+                                class="col-sm-2 col-form-label"
+                                >Name</label
+                            >
+                            <div class="col-sm-10">
+                                <input
+                                    v-model.trim="username"
+                                    type="name"
+                                    class="form-control"
+                                    id="inputName"
+                                    placeholder="ex: ucefe"
+                                />
+                            </div>
+                        </div>
+                        <div class="form-group row mt-2">
+                            <label
+                                for="inputTweet"
+                                class="col-sm-2 col-form-label"
+                                >Tweet</label
+                            >
+                            <div class="col-sm-10">
+                                <textarea
+                                    v-model.trim="tweet"
+                                    class="form-control"
+                                    id="inputTweet"
+                                    rows="3"
+                                    placeholder="Tweet What's On your Mind (less than 50 character)"
+                                ></textarea>
+                            </div>
+                        </div>
+                        <div
+                            v-if="errors.length>0"
+                            class="mt-2 alert alert-danger"
+                            role="alert"
+                        >
+                            {{errors}}
+                        </div>
+                        <button
+                            @click.prevent="addTweet()"
+                            type="submit"
+                            class="mt-2 btn btn-primary"
+                        >
+                            Tweet >>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="mt-5">
+                <table
+                    id="table_id"
+                    class="table table-striped table-bordered table-sm"
+                    cellspacing="0"
+                    style="width: 100%"
+                >
+                    <thead>
+                        <tr>
+                            <th onclick="sortTable(0)" class="th-sm">Name</th>
+                            <th class="th-sm">Message</th>
+                            <th onclick="sortTable(2)" class="th-sm">Time</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="tweet in tweets" :key="tweet.created">
+                            <td>{{tweet.username }}</td>
+                            <td>{{tweet.tweet }}</td>
+                            <td>{{toLocaleTimeString(tweet.created)}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <script>
+            function sortTable(n) {
+                var table,
+                    rows,
+                    switching,
+                    i,
+                    x,
+                    y,
+                    shouldSwitch,
+                    dir,
+                    switchcount = 0;
+                table = document.getElementById("table_id");
+                switching = true;
+                dir = "asc";
+                while (switching) {
+                    switching = false;
+                    rows = table.rows;
+
+                    for (i = 1; i < rows.length - 1; i++) {
+                        shouldSwitch = false;
+
+                        x = rows[i].getElementsByTagName("TD")[n];
+                        y = rows[i + 1].getElementsByTagName("TD")[n];
+
+                        if (dir == "asc") {
+                            if (
+                                x.innerHTML.toLowerCase() >
+                                y.innerHTML.toLowerCase()
+                            ) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        } else if (dir == "desc") {
+                            if (
+                                x.innerHTML.toLowerCase() <
+                                y.innerHTML.toLowerCase()
+                            ) {
+                                shouldSwitch = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (shouldSwitch) {
+                        rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                        switching = true;
+                        switchcount++;
+                    } else {
+                        if (switchcount == 0 && dir == "asc") {
+                            dir = "desc";
+                            switching = true;
+                        }
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
